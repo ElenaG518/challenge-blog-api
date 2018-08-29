@@ -42,7 +42,7 @@ router.post('/', jsonParser, (req, res) => {
 // try to delete that item from ShoppingList.
 router.delete('/:id', (req, res) => {
   BlogPosts.delete(req.params.id);
-  console.log(`Deleted blog item \`${req.params.ID}\``);
+  console.log(`Deleted blog item \`${req.params.id}\``);
   res.status(204).end();
 });
 
@@ -76,7 +76,7 @@ router.put('/:id', jsonParser, (req, res) => {
     author: req.body.author,
     publishDate: req.body.publishDate
   });
-  res.status(204).end();
+  res.status(200).json(updatedItem);
 })
 
 module.exports = router;
