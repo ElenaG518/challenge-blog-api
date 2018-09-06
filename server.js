@@ -120,11 +120,6 @@ app.use("*", function(req, res) {
 // runServer runs, it assigns a value.
 let server;
 
-// closeServer needs access to a server object, but that only
-// gets created when `runServer` runs, so we declare `server` here
-// and then assign a value to it in run
-let server;
-
 // this function connects to our database, then starts the server
 function runServer(databaseUrl, port = PORT) {
 // if (!(port)) {
