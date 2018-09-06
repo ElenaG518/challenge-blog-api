@@ -15,7 +15,7 @@ const { BlogPosts } = require("./models");
 const app = express();
 app.use(express.json());
 
-app.get("/posts", (req, res) => {
+app.get("/blogs", (req, res) => {
   // res.sendFile(__dirname + '/views/index.html');
   BlogPosts.find()
   // success callback: for each restaurant we got back, we'll
@@ -33,7 +33,7 @@ app.get("/posts", (req, res) => {
 });
 
 // can also request by ID
-app.get("/posts/:id", (req, res) => {
+app.get("/blogs/:id", (req, res) => {
   BlogPosts
     // this is a convenience method Mongoose provides for searching
     // by the object _id property
@@ -45,7 +45,7 @@ app.get("/posts/:id", (req, res) => {
     });
 });
 
-app.post("/posts", (req, res) => {
+app.post("/blogs", (req, res) => {
   const requiredFields = ["title", "content", "author"];
   for (let i = 0; i < requiredFields.length; i++) {
     const field = requiredFields[i];
@@ -68,7 +68,7 @@ app.post("/posts", (req, res) => {
     });
 });
 
-app.put("/posts/:id", (req, res) => {
+app.put("/blogs/:id", (req, res) => {
   // ensure that the id in the request path and the one in request body match
   if (!(  (req.params.id) &&  (req.body.id) && (req.params.id === req.body.id) ) ) {
     const message =
