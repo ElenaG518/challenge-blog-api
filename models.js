@@ -2,15 +2,6 @@
 
 const mongoose = require("mongoose");
 
-
-
-
-
-
-
-
-
-
 // this is our schema to represent a restaurant
 const blogSchema = mongoose.Schema({
   title: { type: String, required: true },
@@ -45,6 +36,6 @@ blogSchema.methods.serialize = function() {
 
 // note that all instance methods and virtual properties on our
 // schema must be defined *before* we make the call to `.model`.
-const BlogPosts = mongoose.model("BlogPosts", blogSchema);
+const BlogPost = mongoose.model("BlogPost", blogSchema);
 
-module.exports = { BlogPosts };
+module.exports = { BlogPost };

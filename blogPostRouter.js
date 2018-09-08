@@ -5,18 +5,18 @@ const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
 
-const {BlogPosts} = require('./models');
+const {BlogPost} = require('./models');
 
 // we're going to add some items to ShoppingList
 // so there's some data to look at
-BlogPosts.create("Blog 1", "blog 1", "me", "August 20th, 2018");
-BlogPosts.create("Tomatoes", "blog 2", "you", "May 18th, 1940");
-BlogPosts.create("Peppers", "blog 3", "they", "July 5th, 2013" );
+BlogPost.create("Blog 1", "blog 1", "me", "August 20th, 2018");
+BlogPost.create("Tomatoes", "blog 2", "you", "May 18th, 1940");
+BlogPost.create("Peppers", "blog 3", "they", "July 5th, 2013" );
 
 // when the root of this router is called with GET, return
 // all current ShoppingList items
 router.get('/', (req, res) => {
-  res.json(BlogPosts.get());
+  res.json(BlogPost.get());
 });
 
 // when a new blog is posted, make sure it's
@@ -34,14 +34,14 @@ router.post('/', jsonParser, (req, res) => {
       return res.status(400).send(message);
     }
   }
-  const item = BlogPosts.create(req.body.title, req.body.content, req.body.author, req.body.publishDate);
+  const item = BlogPost.create(req.body.title, req.body.content, req.body.author, req.body.publishDate);
   res.status(201).json(item);
 });
 
 // when DELETE request comes in with an id in path,
 // try to delete that item from ShoppingList.
 router.delete('/:id', (req, res) => {
-  BlogPosts.delete(req.params.id);
+  BlogPost.delete(req.params.id);
   console.log(`Deleted blog item \`${req.params.id}\``);
   res.status(204).end();
 });
@@ -69,7 +69,7 @@ router.put('/:id', jsonParser, (req, res) => {
     return res.status(400).send(message);
   }
   console.log(`Updating blog item \`${req.params.id}\``);
-  const updatedItem = BlogPosts.update({
+  const updatedItem = BlogPost.update({
     id: req.params.id,
     title: req.body.title,
     content: req.body.content,
