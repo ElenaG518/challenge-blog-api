@@ -34,6 +34,22 @@ app.get('/authors', (req, res) => {
     });
 });
 
+// can also request by ID
+app.get("/authors/:id", (req, res) => {
+  Author
+    // this is a convenience method Mongoose provides for searching
+    // by the object _id property
+    .findById(req.params.id)
+
+    .then(author => {
+      res.json(author.serialize())
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ message: "Internal server error" });
+    });
+});
+
 app.post("/authors", (req, res) => {
   const requiredFields = ["firstName", "lastName", "userName"];
   for (let i = 0; i < requiredFields.length; i++) {
@@ -73,7 +89,8 @@ app.post("/authors", (req, res) => {
     });
 });
 
-app.put("authors/:id", (req, res) => {
+app.put("/authors/:id", (req, res) => {
+  console.log("hello");
   // ensure that the id in the request path and the one in request body match
   if (!(  (req.params.id) &&  (req.body.id) && (req.params.id === req.body.id) ) ) {
     const message =
@@ -94,9 +111,10 @@ app.put("authors/:id", (req, res) => {
       toUpdate[field] = req.body[field];
     }
   });
+  
 
   Author
-    .findOne({ userName: updated.userName || '' , _id: { $ne: req.params.id } })
+    .findOne({ userName: toUpdate.userName || '' , _id: { $ne: req.params.id } })
     .then(author => {
       if(author) {
         const message = `Username already taken`;
@@ -106,15 +124,16 @@ app.put("authors/:id", (req, res) => {
       else {
         Author
           // all key/value pairs in toUpdate will be updated -- that's what `$set` does
-          .findByIdAndUpdate(req.params.id, { $set: toUpdate })
+          .findByIdAndUpdate(req.params.id, { $set: toUpdate }, { new: true })
           .then(updatedAuthor=> res.status(201).json(updatedAuthor.serialize()))
-          .catch(err => res.status(500).json({ message: "Internal server error" }));
+          .catch(err => res.status(500).json({ message: err }));
       }
     });
 });    
 
 
-app.delete("/author/:id", (req, res) => {
+app.delete("/authors/:id", (req, res) => {
+  console.log("hello");
   Author.findByIdAndRemove(req.params.id)
     .then(author => res.status(204).end())
     .catch(err => res.status(500).json({message: "Internal server error"}));
@@ -129,17 +148,19 @@ app.get("/posts", (req, res) => {
   // success callback: for each restaurant we got back, we'll
     // call the `.serialize` instance method we've created in
     // models.js in order to only expose the data we want the API return.    
-    
-    .then(blogs => {
+      .then(blogs => {
+      console.log("hello again");
       res.json({
         blogs: blogs.map(blog => blog.serialize())
-      });
     })
+    })  
     .catch(err => {
       console.error(err);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "didn't find posts Internal server error" });
     });
 });
+
+
 
 // can also request by ID
 app.get("/posts/:id", (req, res) => {
@@ -147,10 +168,7 @@ app.get("/posts/:id", (req, res) => {
     // this is a convenience method Mongoose provides for searching
     // by the object _id property
     .findById(req.params.id)
-    .then(post => {
-      post.comments.push({ content: 'a comment on that last comment' });
-      post.save();
-    })
+
     .then(post => {
       res.json(post.serialize())
     })
@@ -176,12 +194,17 @@ app.post("/posts", (req, res) => {
   Author.findById(req.body.author_id)
     .then(author => {
       if (author) {
-        BlogPost.create({
+        console.log(author);
+        BlogPost
+        .create({
           title: req.body.title,
           content: req.body.content,
-          author: req.body.id
+          // author: req.body.id
+          author: author
         })
+        
         .then( blog => res.status(201).json(blog.serialize()))
+                        
         .catch(err => {
           console.error(err);
           res.status(500).json({ message: "Internal server error" });
@@ -225,8 +248,9 @@ app.put("/posts/:id", (req, res) => {
 
   BlogPost
     // all key/value pairs in toUpdate will be updated -- that's what `$set` does
-    .findByIdAndUpdate(req.params.id, { $set: toUpdate }, { new: true })
-    .then(blog => res.status(201).json(blog.serialize()))
+
+    .findByIdAndUpdate(req.params.id, { $set: toUpdate })
+    .then(blog =>  res.status(201).json(blog.serialize()))
     .catch(err => res.status(500).json({ message: "Internal server error" }));
 });
 

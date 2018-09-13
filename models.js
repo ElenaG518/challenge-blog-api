@@ -14,6 +14,8 @@ const authorSchema = mongoose.Schema({
 
 const commentSchema = mongoose.Schema({ content: 'string' });
 
+
+
 // this is our schema to represent a restaurant
 const blogPostSchema = mongoose.Schema({
   title: { type: String, required: true },
@@ -21,7 +23,6 @@ const blogPostSchema = mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },
   comments: [commentSchema]
 });
-
 
 blogPostSchema.pre('findOne', function(next) {
   this.populate('author');
@@ -33,18 +34,10 @@ blogPostSchema.pre('find', function(next) {
   next();
 });
 
-authorSchema.virtual("name").get(function() {
-  return `${this.author.firstName} ${this.author.lastName}`;
+blogPostSchema.pre('findByIdAndUpdate', function(next) {
+  this.populate('author');
+  next();
 });
-
-authorSchema.methods.serialize = function() {
-  return {
-    id: this._id,
-    name: name,
-    userName: this.userName
-  };
-};
-
 // *virtuals* (http://mongoosejs.com/docs/guide.html#virtuals)
 // allow us to define properties on our object that manipulate
 // properties that are stored in the database. Here we use it
@@ -60,14 +53,25 @@ blogPostSchema.virtual("authorName").get(function() {
 blogPostSchema.methods.serialize = function() {
   return {
     id: this._id,
-    title: this.title,
-    content: this.content,
     author: this.authorName,
+    content: this.content,
+    title: this.title,
     comments: this.comments
   };
 };
 
-const Author = mongoose.model('Author', authorSchema);
+authorSchema.virtual("name").get(function() {
+  return `${this.firstName} ${this.lastName}`.trim();
+});
+
+authorSchema.methods.serialize = function() {
+  return {
+    id: this._id,
+    name: this.name,
+    userName: this.userName
+  };
+};
+const Author = mongoose.model("Author", authorSchema);
 // note that all instance methods and virtual properties on our
 // schema must be defined *before* we make the call to `.model`.
 const BlogPost = mongoose.model("BlogPost", blogPostSchema);
