@@ -207,6 +207,7 @@ app.get("/posts/:id", (req, res) => {
     // by the object _id property
     .findById(req.params.id)
     .then(post => {
+
       res.json(post.serialize())
     })
     .catch(err => {
@@ -270,13 +271,20 @@ app.put("/posts/:id", (req, res) => {
   // if the user sent over any of the updatableFields, we udpate those values
   // in document
   const toUpdate = {};
-  const updateableFields = ["title", "content" ];
 
-  updateableFields.forEach(field => {
-    if (field in req.body) {
-      toUpdate[field] = req.body[field];
-    }
-  });
+  // if("comments" in req.body) {
+  //   toUpdate["comments"].push({content: "new comment"});
+  // } else {
+    const updateableFields = ["title", "content" ];
+
+    updateableFields.forEach(field => {
+      if (field in req.body) {
+        toUpdate[field] = req.body[field];
+      }
+    });
+  // }
+
+  
 
   BlogPost
     // all key/value pairs in toUpdate will be updated -- that's what `$set` does
