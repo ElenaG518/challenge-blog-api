@@ -15,8 +15,7 @@ const authorSchema = mongoose.Schema({
 const commentSchema = mongoose.Schema({ content: 'string' });
 
 
-
-// this is our schema to represent a restaurant
+// this is our schema to represent a blogpost
 const blogPostSchema = mongoose.Schema({
   title: { type: String, required: true },
   content: { type: String, required: true },
