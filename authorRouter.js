@@ -23,7 +23,7 @@ router.get('/', (req, res) => {
     });
 });
 
-// get by id
+// author get by id
 router.get('/:id', (req, res) => {
     Author
     .findById(req.params.id)
@@ -36,6 +36,7 @@ router.get('/:id', (req, res) => {
     });
 });
 
+// author post a new author
 router.post('/', (req, res) => {
     // make sure all required fields have values
     const requiredFields = ["firstName", "lastName", "userName"];

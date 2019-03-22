@@ -23,12 +23,12 @@ const blogPostSchema = mongoose.Schema({
   comments: [commentSchema]
 });
 
-blogPostSchema.pre('findOne', function(next) {
+blogPostSchema.pre('find', function(next) {
   this.populate('author');
   next();
 });
 
-blogPostSchema.pre('find', function(next) {
+blogPostSchema.pre('findOne', function(next) {
   this.populate('author');
   next();
 });
@@ -37,13 +37,14 @@ blogPostSchema.pre('findByIdAndUpdate', function(next) {
   this.populate('author');
   next();
 });
+
 // *virtuals* (http://mongoosejs.com/docs/guide.html#virtuals)
 // allow us to define properties on our object that manipulate
 // properties that are stored in the database. Here we use it
-// to generate a human readable string based on the address object
+// to generate a human readable string based on the author object
 // we're storing in Mongo.
-blogPostSchema.virtual("authorName").get(function() {
-  return `${this.author.firstName} ${this.author.lastName}`.trim();
+blogPostSchema.virtual('authorName').get(function() {
+  return `${this.author.name}`;
 });
 
 // this is an *instance method* which will be available on all instances
