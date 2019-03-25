@@ -255,11 +255,49 @@ app.post("/posts", (req, res) => {
     });
   });
 
+  app.put("/posts/comments/:id", (req, res) => {
+    // ensure that the id in the request path and the one in request body match
+    if (!(req.params.id &&  req.body.id && req.params.id === req.body.id ) ) {
+      const message =
+        `Request path id (${req.params.id}) and request body id ` +
+        `(${req.body.id}) must match`;
+      console.error(message);
+      return res.status(400).json({ message: message });
+    }
 
+    const newComment = req.body.comments;
+    console.log("new Comment ", newComment);
+    const toUpdate = {};
+    
+    BlogPost
+    .findById(req.params.id)
+    .then(blog => {
+      if(blog) {
+        const { comments } = blog;
+        
+        console.log("before pushing ", comments);
+        comments.push(newComment);
+        console.log("after pushing: ", comments);
+        
+        toUpdate["comments"]= comments;
+        console.log("update ", toUpdate);
 
+        BlogPost
+        .findByIdAndUpdate(req.params.id, {$set: toUpdate}, {new: true})
+        .then(blog => res.status(202).json(blog.serialize()))
+        .catch(err => res.status(500).json({ message: err }))
+      } else { 
+        const message = "Blog not found";
+        console.error(message);
+        res.status(400).send(message);
+      }
+    })
+    .catch(err => res.status(500).json({ message: `could not find blog with id ${req.params.id}`}))
+  })
+    
 app.put("/posts/:id", (req, res) => {
   // ensure that the id in the request path and the one in request body match
-  if (!(  (req.params.id) &&  (req.body.id) && (req.params.id === req.body.id) ) ) {
+  if (!(req.params.id &&  req.body.id && req.params.id === req.body.id ) ) {
     const message =
       `Request path id (${req.params.id}) and request body id ` +
       `(${req.body.id}) must match`;
@@ -271,28 +309,27 @@ app.put("/posts/:id", (req, res) => {
   // if the user sent over any of the updatableFields, we udpate those values
   // in document
   const toUpdate = {};
-
-  // if("comments" in req.body) {
-  //   toUpdate["comments"].push({content: "new comment"});
-  // } else {
-    const updateableFields = ["title", "content" ];
+      const updateableFields = ["title", "content" ];
 
     updateableFields.forEach(field => {
       if (field in req.body) {
         toUpdate[field] = req.body[field];
       }
     });
-  // }
-
   
-
   BlogPost
     // all key/value pairs in toUpdate will be updated -- that's what `$set` does
 
-    .findByIdAndUpdate(req.params.id, { $set: toUpdate }, {new: true})
-    .then(blog =>  res.status(202).json(blog.serialize()))
+    .findByIdAndUpdate(req.params.id, { $set: toUpdate })
+    .then(() => {
+        BlogPost
+        .findById(req.params.id)
+        .then(blog => res.status(202).json(blog.serialize()))
+        .catch(err => res.status(500).send("Could not retrieve updated item"))
+    })  
     .catch(err => res.status(500).json({ message: "Internal server error" }));
-});
+})    
+
 
 app.delete('/posts/:id', (req, res) => {
   BlogPost
